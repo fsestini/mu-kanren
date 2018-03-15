@@ -1,0 +1,32 @@
+name:                mu-kanren
+version:             0.1.0.0
+github:              "fsestini/mu-kanren"
+license:             BSD3
+author:              "Filippo Sestini"
+maintainer:          "sestini.filippo@gmail.com"
+copyright:           "2018 Filippo Sestini"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on Github at <https://github.com/fsestini/mu-kanren#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- s-cargot
+- mtl
+- text
+
+library:
+  source-dirs: src
+
+executables:
+  mu-kanren-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - mu-kanren
