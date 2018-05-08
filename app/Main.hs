@@ -1,6 +1,5 @@
 module Main where
 
-import DStream
 import MuKanren
 import Programs
 import Term

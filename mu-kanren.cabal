@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ac17752394bf78de8ec919e5211d3eda98919dcfbb31bc4b8a52f740f25529f0
+-- hash: b9398a3fb54230ca3014261c11359ec36c10a48ff3bf8bd9e156ae3f8df3b4fa
 
 name:           mu-kanren
 version:        0.1.0.0
@@ -26,7 +26,6 @@ source-repository head
 
 library
   exposed-modules:
-      DStream
       MuKanren
       Programs
       Term
@@ -40,6 +39,7 @@ library
     , mtl
     , s-cargot
     , text
+    , transformers
   default-language: Haskell2010
 
 executable mu-kanren-exe
@@ -55,4 +55,5 @@ executable mu-kanren-exe
     , mu-kanren
     , s-cargot
     , text
+    , transformers
   default-language: Haskell2010

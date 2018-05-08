@@ -3,14 +3,13 @@ module Programs where
 import MuKanren
 import Wrappers
 import Term
-import DStream
 
 aAndB :: Goal
 aAndB = conj (callFresh (\a -> TVar a === num 7))
              (callFresh (\b -> disj (TVar b === num 5) (TVar b === num 6)))
 
 fives :: Term -> Goal
-fives x = disj (x === num 5) (Delay . fives x)
+fives x = disj (x === num 5) (delay . fives x)
 
 appendo :: Term -> Term -> Term -> Goal
 appendo l s o =
@@ -37,7 +36,7 @@ relo x = runG $ do
   [x1,x2] <- fresh 2
   pure $ conj (x === TPair (TVar x1) (TVar x2))
               (disj (TVar x1 === TVar x2)
-                    (Delay . relo x))
+                    (delay . relo x))
 
 manyNonAns :: Goal
 manyNonAns = callFresh $ \x ->

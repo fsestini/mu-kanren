@@ -2,9 +2,9 @@ module Wrappers where
 
 import Data.Foldable
 import Term
-import DStream
 import MuKanren
 import Control.Monad.Cont
+import Data.Maybe
 import Data.List
 
 ppSub :: Sub -> String
@@ -16,8 +16,8 @@ ppState :: State -> String
 ppState (s,c) = "(" ++ ppSub s ++ ", " ++ show c ++ ")"
 
 conjs, disjs :: [Goal] -> Goal
-conjs = foldr conj pure
-disjs = foldr disj pure
+conjs = foldr conj (pure . one)
+disjs = foldr disj (pure . one)
 
 conde :: [[Goal]] -> Goal
 conde = disjs . fmap conjs
@@ -38,21 +38,29 @@ runG = flip runCont id
 printRes :: [State] -> IO ()
 printRes = mapM_ (putStrLn . printTerm) . fmap reifyFst
 
+-- truncate at at most m delays
+trunc :: Int -> [Elem a] -> [Elem a]
+trunc _ [] = []
+trunc m (Just x : xs) = Just x : trunc m xs
+trunc m (Nothing : xs) = if m == 0 then [] else Nothing : trunc (m - 1) xs
+
+takeLimit :: Int -> Maybe Int -> [Elem a] -> [a]
+takeLimit n m = take n . catMaybes . maybe id trunc m
+
 takeS :: Int -> Goal -> IO ()
-takeS n g = mapM_ putStrLn . fmap ppState . take n . toList $ g emptyState
+takeS n g = mapM_ putStrLn . fmap ppState . takeLimit n Nothing $ g emptyState
 
 takeS' :: Int -> Int -> Goal -> IO ()
-takeS' n l g =
-  mapM_ putStrLn . fmap ppState . toList . takeLimit n l $ g emptyState
+takeS' n m g = mapM_ putStrLn . fmap ppState . takeLimit n (Just m) $ g emptyState
 
 run :: Int -> Goal -> IO ()
-run n g = printRes . take n . toList $ g emptyState
+run n g = printRes . takeLimit n Nothing $ g emptyState
 
 runAll :: Goal -> IO ()
-runAll g = printRes . toList $ g emptyState
+runAll g = printRes . catMaybes $ g emptyState
 
 run' :: Int -> Int -> Goal -> IO ()
-run' n l g = printRes . toList . takeLimit n l $ g emptyState
+run' n l g = printRes . takeLimit n (Just l) $ g emptyState
 
 deepWalk :: Term -> Sub -> Term
 deepWalk t s = case walk t s of
