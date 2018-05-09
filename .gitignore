@@ -1,0 +1,6 @@
+.stack-work/
+dist/
+dist-newstyle/
+mu-kanren.cabal
+*~
+TAGS
