@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b9398a3fb54230ca3014261c11359ec36c10a48ff3bf8bd9e156ae3f8df3b4fa
+-- hash: e70c2bb3be634d8641aaccf24e907bc9c3dde3d7d3e7d4f342bda626b8297c75
 
 name:           mu-kanren
 version:        0.1.0.0
@@ -26,6 +26,7 @@ source-repository head
 
 library
   exposed-modules:
+      All
       MuKanren
       Programs
       Term

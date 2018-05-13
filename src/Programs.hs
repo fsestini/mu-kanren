@@ -4,6 +4,8 @@ import MuKanren
 import Wrappers
 import Term
 
+delay = (Nothing :)
+
 aAndB :: Goal
 aAndB = conj (callFresh (\a -> TVar a === num 7))
              (callFresh (\b -> disj (TVar b === num 5) (TVar b === num 6)))

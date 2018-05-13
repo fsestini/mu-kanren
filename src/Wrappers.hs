@@ -1,6 +1,5 @@
 module Wrappers where
 
-import Data.Foldable
 import Term
 import MuKanren
 import Control.Monad.Cont
@@ -16,8 +15,8 @@ ppState :: State -> String
 ppState (s,c) = "(" ++ ppSub s ++ ", " ++ show c ++ ")"
 
 conjs, disjs :: [Goal] -> Goal
-conjs = foldr conj (pure . one)
-disjs = foldr disj (pure . one)
+conjs = foldr conj (pure . Just)
+disjs = foldr disj (pure . Just)
 
 conde :: [[Goal]] -> Goal
 conde = disjs . fmap conjs
@@ -39,12 +38,12 @@ printRes :: [State] -> IO ()
 printRes = mapM_ (putStrLn . printTerm) . fmap reifyFst
 
 -- truncate at at most m delays
-trunc :: Int -> [Elem a] -> [Elem a]
+trunc :: Int -> [Maybe a] -> [Maybe a]
 trunc _ [] = []
 trunc m (Just x : xs) = Just x : trunc m xs
 trunc m (Nothing : xs) = if m == 0 then [] else Nothing : trunc (m - 1) xs
 
-takeLimit :: Int -> Maybe Int -> [Elem a] -> [a]
+takeLimit :: Int -> Maybe Int -> [Maybe a] -> [a]
 takeLimit n m = take n . catMaybes . maybe id trunc m
 
 takeS :: Int -> Goal -> IO ()
@@ -65,7 +64,7 @@ run' n l g = printRes . takeLimit n (Just l) $ g emptyState
 deepWalk :: Term -> Sub -> Term
 deepWalk t s = case walk t s of
   TPair t1 t2 -> TPair (deepWalk t1 s) (deepWalk t2 s)
-  t -> t
+  t' -> t'
 
 data ReifiedVar = RV Int deriving Eq
 instance Show ReifiedVar where show (RV i) = "_." ++ show i
@@ -74,7 +73,7 @@ reifyS :: Term -> Sub -> Sub
 reifyS t s = case walk t s of
   TVar v -> let n = TData (RV (length s)) in (v, n) : s
   TPair t1 t2 -> reifyS t2 (reifyS t1 s)
-  t' -> s
+  _ -> s
 
 reifyFst :: State -> Term
 reifyFst sc = let v = deepWalk (TVar 0) (fst sc) in deepWalk v (reifyS v [])
